@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Inventory</string>
+    <string name="solded">已售:</string>
+    <string name="inventory">库存:</string>
+    <string name="add_product">添加新产品</string>
+    <string name="no_data">NO DATA</string>
+    <string name="product_title">商品名称</string>
+    <string name="product_price">商品价格</string>
+    <string name="sure">确定</string>
+    <string name="input_error">输入格式有误</string>
+    <string name="add_error">添加失败</string>
+    <string name="add_success">添加成功</string>
+    <string name="inventory_add">收货一件</string>
+    <string name="sold">售出一件</string>
+    <string name="clear_product">清除产品</string>
+    <string name="connect">订购更多</string>
+    <string name="inventory_null">库存不足</string>
+    <string name="success">成功</string>
+    <string name="error">失败</string>
+    <string name="cancel">取消</string>
+    <string name="choose_email">Choose an Email Client</string>
+    <string name="email_url">info@skillgun.com</string>
+    <string name="clear_message">确认删除吗？</string>
+    <string name="hint">提示</string>
+</resources>
