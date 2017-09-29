@@ -1,14 +1,19 @@
 package com.ascend.wangfeng.inventory;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +28,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         //获取数据
-        final Product product = (Product) getIntent().getSerializableExtra(MainActivity.KEY_PRODUCT);
+        final Product product = (Product) getIntent().getSerializableExtra(ProductAdapter.KEY_PRODUCT);
 
         //实例化控件
         TextView titleView = (TextView) findViewById(R.id.title);
@@ -34,7 +39,8 @@ public class DetailActivity extends AppCompatActivity {
         Button addInventoryBtn = (Button) findViewById(R.id.add);
         final Button clearBtn = (Button) findViewById(R.id.clear);
         final Button connectBtn = (Button) findViewById(R.id.connect);
-        final SQLiteDatabase database = new DbHelper(this).getWritableDatabase();
+        final DbHelper dbHelper = new DbHelper(this);
+        final SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         //初始化
         titleView.setText(product.getTitle());
@@ -44,19 +50,12 @@ public class DetailActivity extends AppCompatActivity {
         soldBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (product.getInventoryCount() > 0) {
-                    ContentValues values = new ContentValues();
-                    product.setSoldCount(product.getSoldCount() + COUNT_CHANGE);
-                    product.setInventoryCount(product.getInventoryCount() - COUNT_CHANGE);
-                    values.put(Contract.SOLD_COUNT, product.getSoldCount());
-                    values.put(Contract.INVENTORY_COUNT, product.getInventoryCount());
-                    database.update(DbHelper.TABLE_PRODUCT_NAME, values, Contract.ID + " = ?",
-                            new String[]{String.valueOf(product.getId())});
+                if (dbHelper.sold(product, COUNT_CHANGE)) {
                     Toast.makeText(DetailActivity.this, R.string.success, Toast.LENGTH_SHORT).show();
                     soldView.setText(getString(R.string.solded) + product.getSoldCount());
                     inventoryView.setText(getString(R.string.inventory) + product.getInventoryCount());
                 } else {
-                    Toast.makeText(DetailActivity.this, R.string.inventory_null, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -87,7 +86,7 @@ public class DetailActivity extends AppCompatActivity {
                         finish();
                     }
                 });
-                builder.setNegativeButton(R.string.cancel,null);
+                builder.setNegativeButton(R.string.cancel, null);
                 builder.create().show();
             }
         });
@@ -97,10 +96,32 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent email = new Intent(Intent.ACTION_SEND);
                 email.setType(EMAIL_TYPE);
-                email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.email_url)});
+                email.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.email_url)});
                 email.putExtra(Intent.EXTRA_SUBJECT, product.getTitle());
                 startActivity(Intent.createChooser(email, getString(R.string.choose_email)));
             }
         });
+
+        ImageView imageView = (ImageView) findViewById(R.id.image);
+        if (product.getImage()!=null){
+        Uri uri = getUri(product.getImage());
+        imageView.setImageURI(uri);}
     }
+
+    private Uri getUri(String path) {
+        Uri mediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = this.getContentResolver().query(mediaUri,
+                null,
+                MediaStore.Images.Media.DISPLAY_NAME + "= ?",
+                new String[] {path.substring(path.lastIndexOf("/") + 1)},
+                null);
+
+        Uri uri = null;
+        if(cursor.moveToFirst()) {
+            uri = ContentUris.withAppendedId(mediaUri,
+                    cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID)));
+        }
+        cursor.close();
+        return uri;}
+
 }

@@ -55,4 +55,15 @@
         tools:text="库存: 20"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/btn_sold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/sold"
+        app:layout_constraintLeft_toRightOf="@+id/count_sold"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 </android.support.constraint.ConstraintLayout>
